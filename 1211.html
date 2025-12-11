@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>便當要猛</title>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+    <header>
+        <h1>便當工廠💪</h1>
+        <ul>
+            <li><a href="#">最新消息</a></li>
+            <li><a href="#">關於我們</a></li>
+            <li><a href="#">門市據點</a></li>
+            <li><a href="#">會員專區</a></li>
+        </ul>
+    </header>
+
+    <main>
+        <section class="shop">
+            <img src="image/店.png" alt="便當工廠大台中店">
+            <img src="image/店2.png" alt="便當工廠大台中店">
+        </section>
+        <section class="info">
+                <h2>12/23大台中店隆重開幕!</h2>
+                <p>明亮通透的空間設計，搭配綠意盎然的植栽點綴，營造出寧靜舒適的用餐氛圍,<br>
+                立即預訂，開啟您的健康美味之旅！</p>
+        </section>
+        <section class="product">
+            <div>
+                <img src="image/雞胸.jpg" alt="鮮嫩雞胸">
+                <h3>國產雞胸便當</h3>
+                <p>低脂高蛋白的完美選擇。以舒肥工法鎖住水分，口感滑嫩，健身減脂必備。<br><strong>150NT</strong></p>
+                <button class="order" data-item="國產雞胸便當" data-price="150">加入訂單</button>
+            </div>
+            <div>
+                <img src="image/豬肉.png" alt="豬肉">
+                <h3>炙燒舒肥里肌便當</h3>
+                <p>選用低脂里肌部位，口感Q彈脆嫩。低溫烹調後炙燒，美味與健康兼得。<br><strong>200NT</strong></p>
+                <button class="order" data-item="炙燒舒肥里肌便當" data-price="200">加入訂單</button>
+            </div>
+
+            <div>
+                <img src="image/牛排.jpg" alt="肋眼牛排">
+                <h3>澳洲肋眼牛排便當</h3>
+                <p>嚴選優質肋眼部位，搭配獨家調味。補充鐵質與胺基酸，口感豐富，活力加倍。<br><strong>220NT</strong></p>
+                <button class="order" data-item="澳洲肋眼牛排便當" data-price="220">加入訂單</button>
+            </div>
+
+            <div>
+                <img src="image/鮭魚.jpg" alt="鮭魚">
+                <h3>冰島鮭魚菲力便當</h3>
+                <p>簡單香烤，鮮甜多汁。富含Omega-3不飽和脂肪酸，對心血管及大腦健康極有益處。<br><strong>250NT</strong></p>
+                <button class="order" data-item="冰島鮭魚菲力便當" data-price="250">加入訂單</button>
+            </div>
+            
+        </section>
+        <section class="news">
+            <h2>健康便當限時供應</h2>
+            <p><strong>嚴選新鮮食材和極致匠人精神</strong></p>
+            <p><em><a href="#">了解更多</a></em></p>
+        </section>
+        <div id="cart-container">
+            <h2>🛒 我的訂單</h2>
+            <ul id="cart-items">
+                <li>您的購物車是空的。</li>
+            </ul>
+            <p>總金額：<span id="cart-total">0</span> NT</p>
+            <div class="cart-actions">
+                <button id="checkout-btn">前往結帳</button>
+                <button id="clear-cart-btn" class="clear-btn">清空</button>
+            </div>
+        </div>
+
+        <div id="checkout-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>📝 結帳確認</h2>
+                
+                <div class="form-group">
+                    <label>訂單明細：</label>
+                    <ul id="modal-cart-list" class="order-summary-list">
+                        </ul>
+                    <p style="text-align: right; font-weight: bold; color: #d56838;">
+                        應付金額：<span id="modal-total-price">0</span> NT
+                    </p>
+                </div>
+
+                <form id="checkout-form">
+                    <div class="form-group">
+                        <label for="customer-name">訂購人姓名：</label>
+                        <input type="text" id="customer-name" placeholder="請輸入姓名" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer-phone">聯絡電話：</label>
+                        <input type="tel" id="customer-phone" placeholder="09xx-xxx-xxx" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment-method">付款方式：</label>
+                        <select id="payment-method" required>
+                            <option value="" disabled selected>請選擇付款方式</option>
+                            <option value="cash">💰 貨到付款 (現金)</option>
+                            <option value="line_pay">📱 Line Pay</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pickup-method">取餐方式：</label>
+                        <select id="pickup-method">
+                            <option value="store">門市自取</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn-confirm">確認下單</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            
+            // =========================================================
+            // I. 核心數據類別 (Data Model)
+            // =========================================================
+
+            /**
+             * Cart 類別: 專注於管理商品列表和總金額計算。
+             * 概念: 封裝 (Encapsulation) - 將數據 (this.items) 與操作 (addItem, getTotal) 綁定。
+             */
+            class Cart {
+                constructor() {
+                    this.items = []; 
+                }
+
+                // 方法: 計算總金額
+                getTotal() {
+                    return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+                }
+
+                // 方法: 添加商品
+                addItem(name, price) {
+                    const existingItem = this.items.find(item => item.name === name);
+
+                    if (existingItem) {
+                        existingItem.quantity += 1; 
+                    } else {
+                        this.items.push({ name: name, price: price, quantity: 1 }); 
+                    }
+                    return true;
+                }
+
+                // 方法: 清空購物車
+                clear() {
+                    this.items = [];
+                }
+
+                // 方法: 取得訂單摘要
+                getSummary() {
+                    return this.items.map(item => ({
+                        name: item.name,
+                        quantity: item.quantity,
+                        subtotal: item.price * item.quantity
+                    }));
+                }
+            }
+
+            // =========================================================
+            // II. 繼承與多型 (Polymorphism & Inheritance)
+            // =========================================================
+
+            /**
+             * BasePaymentHandler 類別: 作為所有付款方式的抽象基礎。
+             * 概念: 抽象化 (Abstraction) - 定義了 `checkout` 流程，但將細節 (processPayment) 留給子類實作。
+             */
+            class BasePaymentHandler {
+                constructor(cart) {
+                    this.cart = cart;
+                }
+
+                // 抽象方法: 處理支付，子類必須實現 (實現多型)
+                processPayment(orderData) {
+                    throw new Error("子類必須實現 processPayment 方法");
+                }
+
+                // 通用方法: 執行結帳
+                checkout(orderData) {
+                    if (this.cart.getTotal() === 0) {
+                        alert('購物車為空，無法結帳。');
+                        return false;
+                    }
+                    this.processPayment(orderData); // 多型: 根據實例化類型執行不同的支付邏輯
+                    this.cart.clear(); 
+                    return true;
+                }
+            }
+
+            /**
+             * CashPaymentHandler 類別: 現金付款處理。
+             * 概念: 繼承 (Inheritance) - 繼承了 BasePaymentHandler 的 checkout 流程。
+             */
+            class CashPaymentHandler extends BasePaymentHandler {
+                processPayment(orderData) {
+                    const finalPrice = this.cart.getTotal();
+                    alert(`✅ 訂單已成立！\n\n感謝 ${orderData.name} 的訂購。\n付款方式：${orderData.paymentMethod}\n總金額：${finalPrice} NT\n\n請準備現金於取餐時付款！`);
+                }
+            }
+
+            /**
+             * LinePayHandler 類別: Line Pay 處理。
+             * 概念: 多型 (Polymorphism) - 與 CashPaymentHandler 具有相同的 processPayment 介面，但內部行為不同。
+             */
+            class LinePayHandler extends BasePaymentHandler {
+                processPayment(orderData) {
+                    const finalPrice = this.cart.getTotal();
+                    alert(`✅ 訂單已成立！\n\n感謝 ${orderData.name} 的訂購。\n付款方式：${orderData.paymentMethod}\n總金額：${finalPrice} NT\n\n正在模擬跳轉至 Line Pay 付款頁面...`);
+                }
+            }
+
+            // =========================================================
+            // III. 視圖/控制器類別 (View/Controller)
+            // =========================================================
+
+            /**
+             * CartView 類別: 專注於將 Cart 數據渲染到 DOM 介面。
+             * 概念: 職責分離 (Separation of Concerns) - 將數據操作 (Cart) 與介面操作 (CartView) 分開。
+             */
+            class CartView {
+                constructor(cart, cartElementId, totalElementId, modalListId, modalTotalId) {
+                    this.cart = cart;
+                    this.cartItemsElement = document.getElementById(cartElementId);
+                    this.cartTotalElement = document.getElementById(totalElementId);
+                    this.modalCartList = document.getElementById(modalListId);
+                    this.modalTotalPrice = document.getElementById(modalTotalId);
+                }
+
+                // 方法: 渲染購物車側邊欄
+                renderSidebar() {
+                    this.cartItemsElement.innerHTML = ''; 
+                    const total = this.cart.getTotal();
+                    const items = this.cart.getSummary();
+
+                    if (items.length === 0) {
+                        this.cartItemsElement.innerHTML = '<li>您的購物車是空的。</li>';
+                    } else {
+                        items.forEach(item => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `${item.name} (x${item.quantity}) <span>${item.subtotal} NT</span>`;
+                            this.cartItemsElement.appendChild(li);
+                        });
+                    }
+                    this.cartTotalElement.textContent = total; 
+                }
+
+                // 方法: 渲染結帳彈窗內容
+                renderModal() {
+                    this.modalCartList.innerHTML = '';
+                    const total = this.cart.getTotal();
+                    const items = this.cart.getSummary();
+
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<span>${item.name} x ${item.quantity}</span> <span>${item.subtotal} NT</span>`;
+                        this.modalCartList.appendChild(li);
+                    });
+                    this.modalTotalPrice.textContent = total;
+                }
+
+                // 初始化時渲染
+                init() {
+                    this.renderSidebar();
+                }
+            }
+
+            /**
+             * App 類別: 應用程式的主控制器，負責初始化和協調所有元件。
+             * 概念: 協調器 (Coordinator) / 門面模式 (Facade Pattern) - 作為單一入口，負責組裝和管理其他類別的實例。
+             */
+            class App {
+                constructor() {
+                    // 實例化核心數據模型
+                    this.cart = new Cart(); // 概念: 實例化 (Instantiation)
+
+                    // 實例化視圖元件
+                    this.view = new CartView(
+                        this.cart,
+                        'cart-items',
+                        'cart-total',
+                        'modal-cart-list',
+                        'modal-total-price'
+                    );
+
+                    // 實例化 DOM 元素 (作為內部屬性)
+                    this.orderButtons = document.querySelectorAll('.order');
+                    this.checkoutButton = document.getElementById('checkout-btn');
+                    this.clearCartButton = document.getElementById('clear-cart-btn');
+                    this.modal = document.getElementById("checkout-modal");
+                    this.closeModalSpan = document.getElementsByClassName("close")[0];
+                    this.checkoutForm = document.getElementById("checkout-form");
+                }
+
+                // 方法: 綁定所有事件
+                bindEvents() {
+                    // 使用 .bind(this) 確保事件處理器中的 this 指向 App 實例
+                    this.orderButtons.forEach(button => {
+                        button.addEventListener('click', this.handleAddItem.bind(this));
+                    });
+
+                    this.clearCartButton.addEventListener('click', this.handleClearCart.bind(this));
+                    this.checkoutButton.addEventListener('click', this.handleOpenModal.bind(this));
+                    this.closeModalSpan.onclick = this.handleCloseModal.bind(this);
+                    window.onclick = (event) => {
+                        if (event.target == this.modal) {
+                            this.handleCloseModal();
+                        }
+                    };
+                    this.checkoutForm.addEventListener('submit', this.handleCheckout.bind(this));
+                }
+
+                // 事件處理方法: 結帳
+                handleCheckout(e) {
+                    e.preventDefault(); 
+                    
+                    // 從 DOM 取得表單數據
+                    const name = document.getElementById('customer-name').value;
+                    const paymentElement = document.getElementById('payment-method');
+                    const paymentValue = paymentElement.value;
+                    const paymentText = paymentElement.options[paymentElement.selectedIndex].text;
+
+                    const orderData = {
+                        name: name,
+                        paymentMethod: paymentText
+                    };
+                    
+                    let paymentHandler;
+
+                    // 根據選擇的付款方式，實例化對應的處理器 (多型實踐)
+                    if (paymentValue === 'cash') {
+                        paymentHandler = new CashPaymentHandler(this.cart);
+                    } else if (paymentValue === 'line_pay') {
+                        paymentHandler = new LinePayHandler(this.cart);
+                    } else {
+                        alert('請選擇有效的付款方式。');
+                        return;
+                    }
+
+                    // 執行結帳流程
+                    if (paymentHandler.checkout(orderData)) {
+                        this.view.renderSidebar(); 
+                        this.checkoutForm.reset(); 
+                        this.handleCloseModal();
+                    }
+                }
+
+                // 其他事件處理器 (handleAddItem, handleClearCart, handleOpenModal, handleCloseModal...) 
+                // 邏輯與前一個版本相同，負責呼叫 Cart 和 View 的方法。
+                handleAddItem(event) {
+                    const button = event.currentTarget;
+                    const itemName = button.getAttribute('data-item');
+                    const itemPrice = parseInt(button.getAttribute('data-price'));
+                    
+                    this.cart.addItem(itemName, itemPrice);
+                    alert(`已將【${itemName}】加入訂單！`);
+                    this.view.renderSidebar();
+                }
+
+                handleClearCart() {
+                    if (confirm('確定要清空整個購物車嗎？')) {
+                        this.cart.clear();
+                        this.view.renderSidebar();
+                    }
+                }
+
+                handleOpenModal() {
+                    if (this.cart.getTotal() === 0) {
+                        alert('請先加入商品才能結帳喔！');
+                        return;
+                    }
+                    this.view.renderModal();
+                    this.modal.style.display = "flex";
+                }
+
+                handleCloseModal() {
+                    this.modal.style.display = "none";
+                }
+
+                // 應用程式啟動入口
+                init() {
+                    this.view.init(); 
+                    this.bindEvents(); 
+                }
+            }
+
+            // 啟動應用程式 (單一控制點)
+            const bentoApp = new App();
+            bentoApp.init();
+        
+        </script>
+    </main>
+    <footer>
+        <p>Copyright @ 2025 便當工廠 ALL RIGHTS RESERVED.</p>
+    </footer>
+</body>
+</html>
